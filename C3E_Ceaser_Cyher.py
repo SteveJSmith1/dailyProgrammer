@@ -3,6 +3,10 @@
 Created on Mon Mar  6 13:25:35 2017
 
 @author: SteveJSmith1
+
+This program implements the Ceaser Cypher on an
+inputted string or file
+
 """
 
 import codecs
@@ -29,6 +33,10 @@ def welcome():
     return 
     
 def cencode(string=None):
+    """
+    encodes a string with the ceaser cypher
+    if none is passed, it asks for input
+    """
     if string == None:
         print("Enter a string to encode:")
         string = str(input("> "))
@@ -37,6 +45,10 @@ def cencode(string=None):
     return enc(string)[0]
     
 def cdecode(string=None):
+    """
+    decodes a string with the ceaser cypher
+    if none is passed, it asks for input
+    """
     if string == None:
         print("Enter a string to decode:")
         string = str(input("> "))
@@ -44,6 +56,10 @@ def cdecode(string=None):
     return dec(string)[0]
     
 def fileCypher():
+    """
+    When a filepath is entered it decodes/encodes
+    and writes to a file
+    """
     print("Enter full path including file")
     filename = str(input(">"))
     with open(filename, 'r', errors='ignore') as f:
