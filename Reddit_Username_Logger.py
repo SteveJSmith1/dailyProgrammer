@@ -25,7 +25,7 @@ def infoSave():
     username = str(input("Please enter your reddit username: "))
     
     fields = [name, age, username]
-    with open('names.csv', 'a', newline='') as csvfile:
+    with open('Reddit_Usernames.csv', 'a', newline='') as csvfile:
         infowriter = csv.writer(csvfile)
         infowriter.writerow(fields)
     return print("""
