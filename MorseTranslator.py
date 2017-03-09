@@ -4,351 +4,188 @@ Created on Mon Mar  6 16:02:59 2017
 
 @author: SteveJSmith1
 
-name of pregram: MorseTranslator.py
+name of program: MorseTranslator.py
 
+This program encodes from morse code to
+text and decode from text to morse code, either
+from strings or files.
 
-This program will encode from morse code to
-text and decode from text to morse code.
+See test.py for complete usage details
 
-Usage1: welcome() runs the user interface
+Usage:
+    morseCoder(string=None, file=None, encode=False, decode=False, full=True, save=False)
 
-    option for encoding or decoding
-    option for string or file
-    
-Usage2: import MorseTranslator
-    
-    Encoding a passed string to Morse code
-        encodeText(text_string)
-        
-    Encoding a passed file to Morse code
-        encodeFile(filepath)
-        or
-        encodeFile() to specify filepath in-function
-        
-    Decoding a passed Morse string to text
-        decodeMorse(Morse_string)
-        
-    Decoding a passed file to Text
-        decodeFile(filepath)
-        or
-        decodeFile() to specify filepath in-function
-
+    Encode a string keeping punctuation:
+        morseCoder(string, encode=True)
+    Encode a file without punctuation:
+        (useful for written speech)
+        f = 'your_file.txt'
+        morseCoder(file=f, encode=True, full=False)
+    Decode a file containing Morse Code:
+        morseCoder(string, decode=True)
+    Saving output (save=True):
+        morseCoder(file=f, encode=True, save=True)
 """
 
 
-    
-#======================================
 
-# v1
 
-import time
+#=============================================
 
-def welcome():
+## Morse Alphabet
+
+#=============================================
+
+def coder(letter_list, encode=False, decode=False, save=False):
     """
-    Displays the user interface for the program
+    The encoding/decoding function, returns
+    an encoded/decoded string when passed a list
+    of letters.
+    Called from morseCoder()
     """
     
-    # collects first input
-    input1 = choice1()
+    # Dict of {character : Morse} pairs
     
-    
-    if input1 == 'e':
-        # encoding choice selected
-        enChoice()
+    alphabet = {
+            'a' : '.-', 'b' : '-...' , 'c' : '-.-.', 'd' : '-..',
+            'e' : '.', 'f' : '..-.', 'g' : '--.', 'h' : '....',
+            'i' : '..', 'j': '.---', 'k' : '-.-', 'l' : '.-..',
+            'm' : '--', 'n' : '-.', 'o' : '---', 'p' : '.--.',
+            'q' : '--.-', 'r' : '.-.', 's' : '...', 't' : '-', 'u' : '..-',
+            'v' : '...-', 'w' : '.--', 'x' : '-..-', 'y' : '-.--', 
+            'z' : '	--..', '0' : '-----', '1' : '.----', '2':'..---', 
+            '3' : '...--', '4' : '....-', '5' : '.....', '6' : '-....', 
+            '7' : '--...', '8' : '---..', '9' : '----.', '.' : '.-.-.-',
+            ',' : '--..--', ":" : '---...', '?' : '..--..', "'" : '.----.',
+            '-' : '-....-', '/' : '-..-.', '(' : '-.--.-', ')' : '-.--.-',
+            '"' : '.-..-.', '@' : '.--.-.', '=' : '-...-', '!' : '-.-.--',
+            ' ' : '/', '\n' : '/ .-.-'
+            }  
+    coded = []
+    if encode==True:
+        for elem in letter_list:
+            if elem not in alphabet:
+                continue
+            else:                
+                coded.append(alphabet.get(elem))
         
-    elif input1 == 'd':
-        # decoding choice selected
-        deChoice()
+        coded_string = ' '.join(coded)
         
+    elif decode==True:
+        # newline character needs to change
+        alphabet.pop('\n', None)
+        # swap {key:value} pairs
+        inverted = {}
+        for key, value in alphabet.items():
+            inverted[value] = key
+        # replace newline character
+        inverted['.-.-'] = '\n'
+        
+        for elem in letter_list:
+            if elem not in inverted:
+                continue
+            else:
+                coded.append(inverted.get(elem))
+         
+                
+        coded_string = ''.join(coded)
     else:
-        # catch quit call
-        print("Quitting, goodbye!")
-    return
-        
-def header():
-    return print('-'*51)
+        return
+            
     
-    
-def choice1():
-    """
-    This function fetches the first option;
-    whether to encode to Morse or decode from Morse
-    
-    Do not call directly
-    """
-    header()
-    print("Welcome to the Morse code Encoder/Decoder")
-    header()
-    time.sleep(0.2)
-    print("Do you wish to [e]ncode or [d]ecode")
-    print("Press any other key to quit")
-    input1 = str(input("> "))
-    header()
-    return input1
-    
-    
-def enChoice():
-    """
-    This function provides the options when
-    [e]ncoding is selected in input1
-    
-    Do not call directly    
-    """
-    print("Encoding chosen")
-    header()
-    print("Do you wish to encode a typed [s]tring or a [f]ile?")
-    time.sleep(0.2)
-    
-    # second input collected 
-    input2 = str(input("> "))
-    
-    if input2 == 's':
-        print("Please type a text string:")
-        time.sleep(0.2)
-        text_string = str(input("> "))
-        print("Encoding to morse: ")
-        # call the main encoding function to encode 
-        # the text string
-        return print(encodeText(text_string))
-        
-    elif input2 == 'f':
-        # call the main function to encodeFile
-        return encodeFile()
-    
+    if save is True:
+        return fileSave(coded_string)
     else:
-        print("Error: only s or f allowed as inputs")
-    return
-    
-    
-def deChoice():
-    """
-    This function provides the options when [d]ecode
-    is set in option 1
-    
-    Do not call directly
-    """
-    print("Decoding chosen")
-    header()
-    print("Do you wish to decode a typed [s]tring or a [f]ile?")
-    time.sleep(0.2)
-    input2 = str(input("> "))
-    
-    if input2 == 's':
-        print("Please type a string of Morse code")
-        print("In the form: ")
-        print("-.-. ... / -... -.-- / -... . -. . -.. .. -.-. - ")
-        time.sleep(0.2)
-        morse_string = str(input("> "))
-        print("Decoding to text")
-        return print(decodeMorse(morse_string))
-    elif input2 == 'f':
-        return decodeFile()
-    else:
-        print("Error: only s or f allowed as inputs")
-    return
-    
-#===========================================
-# File operations
-#===========================================
+            
+        return coded_string
 
-def fileOpen(filename):
-    with open(filename, 'r', encoding='utf-8', errors='ignore') as f:
-        return f.read()
-        
+def morseCoder(string=None, file=None, encode=False, decode=False, full=True, save=False):
+    # error catch
+    if (string is None and file is None):
+        print("string or file must be passed")
+        return
+    # error catch
+    if (encode==False and decode==False):
+        print("encode=True or decode=True must be set")
+        return
+    # string operations
+    if string is not None:
+        if encode==True:
+            letter_list = processTxtString(string, full=full)
+        elif decode==True:
+            letter_list = processMorseString(string)
+    # file operations       
+    elif file is not None:
+        if encode==True:
+            text_string = processFile(file)
+            letter_list = processTxtString(text_string, full=full)
+        elif decode==True:
+            morse_string = processFile(file)
+            letter_list = processMorseString(morse_string)
+    # error catch   
+    else:
+        print("Unknown Error")
+        return 
+    # pass the list of letters obtained above
+    # to the coder function with the specified
+    # arguments
+    return coder(letter_list,encode=encode,decode=decode,save=save)
+    
+def processTxtString(text_string, full=True):
+    """
+    This is the module that processes the passed
+    text string
+    
+    Use full=False if wishing to process a 
+    text_string for removing punctuation, as in         
+    speech
+    """
+    import re
+    
+    if full != True:
+        # strip punctuation
+        rem_newline = re.sub(r'[\n]', ' ', text_string)
+        rem_punc = re.sub(r'[^\w\s' ']','',rem_newline)
+        # create a list of letters
+        letter_list = list(rem_punc)
+    else:
+        # don't strip punctuation
+        letter_list = list(text_string)
+    # convert to lower case as morse doesn't do case
+    return [i.lower() for i in letter_list]
+ 
+
+
+def processMorseString(string):
+    # Whitespace used as letter seperators
+    letter_list = string.split()
+    return letter_list
+
+
+
+
+
+def processFile(file):
+    """
+    converts a file to a string
+    """
+    with open(file, 'r', encoding='utf-8', errors='ignore') as f:
+        text_string = f.read()
+    return text_string
+    
+
         
 def fileSave(string):
+    """
+    writes a string to file
+    
+    """
     print("Please enter a filename to save as:")
     file_name = str(input("> ")) + '.txt'
     with open(file_name, 'w', encoding='utf-8', errors='ignore') as file:
             file.write(string)
     return print("File %s" % file_name + " has been created")
+    
 
-
-#===========================================
-# Text processing functions
-#===========================================
-        
-def processTxt(text_string):
-    """
-    This is the module that processes the passed
-    text string
-    """
-    import re
-    # strip punctuation
-    rem_punc = re.sub(r'[^\w\s]','',text_string)
-    # split into words
-    text_words = rem_punc.split()
-    # convert to lower case and make each word a list of letters
-    text_letters = [list(word.lower()) for word in text_words]
-    
-    numbers = ['0','1','2','3','4','5','6','7','8','9']
-    
-    processed = []
-    for i in range(len(text_letters)):
-        words = []
-        for c in text_letters[i]:
-            if c in numbers:
-                # call numberWords() to chage digits 
-                # to words
-                words.append(numberWords(int(c), p=True))
-                # a list of lists is created which 
-                # needs to be flattened
-                words = [item for sublist in words for item in sublist]
-            else:
-                words.append(c)
-        processed.append(words)
-    return processed
-
-    
-def numberWords(key, p=False):
-    """
-    This function returns the word version of a 
-    passed number
-    
-    p = True provides the processing necessary for
-    conversion to morse
-    """
-    number_words = {1: 'One', 2: 'Two', 3: 'Three', 
-                    4: 'Four', 5: 'Five', 6: 'Six',
-                    7: 'Seven', 8: 'Eight', 9: 'Nine',
-                    0: 'zero'}
-    if p == False:
-        return number_words[key]
-    else:
-        # returns lowercase letter required to decode
-        nw = number_words[key]
-        processed = [c.lower() for c in nw]
-    
-    return processed
-
-
-#=================================================
-
-# Main Ecoding/Decoding Functions
-
-#=================================================
-
-def encodeText(text_string):
-    """
-    Use this function to encode a text string
-    to morse
-    
-    usage:
-        text = "The 1, %cheese, I wanted"
-        encodeText(text)
-    """
-    processed = processTxt(text_string)
-    return morseEncode(processed)
-    
-    
-def encodeFile(filepath=None):
-    """
-    Use this function to encode a file to Morse
-    
-    usage: encodeFile() or encodeFile(filepath)
-    """
-    if filepath is None:
-        print("Please enter a full filepath to the file")
-        filepath = str(input("> "))
-    string = fileOpen(filepath)
-    print("Processing file, please wait..")
-    morse_string = encodeText(string)
-    return fileSave(morse_string)
-    
-    
-def decodeMorse(morse_string):
-    """
-    Use this function to decode a file from Morse
-    
-    Usage: decodeMorse(morse_string)
-    """
-    return morseDecode(morse_string)
-    
-    
-def decodeFile(filepath=None):
-    """
-    Use this function to decode a file from Morse
-    
-    usage: decodeFile() or decodeFile(filepath)
-    """
-    if filepath is None:
-        print("Please enter a full filepath to the file")
-        filepath = str(input("> "))
-    morse_string = fileOpen(filepath)
-    header()
-    print("Processing file, please wait..")
-    text_string = morseDecode(morse_string)
-    return fileSave(text_string)
-        
-#==================================================
-
-# Called encoding functions
-
-#==================================================
-
-def morseEncode(list_of_lists):
-    """
-    # a list of lists is needed, this is created
-    # via processTxt(text string)
-    # function shouldn't be called directly
-    """
-    
-    morse_alphabet = ['.-', '-...', '-.-.', '-..', '.', '..-.', '--.', '....', '..', '.---', '-.-', '.-..', '--', '-.', '---', '.--.', '--.-', '.-.', '...', '-', '..-', '...-', '.--', '-..-', '-.--', '--..']
-    
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    
-    translate = []
-    for i in range(len(list_of_lists)):
-        words = []
-        
-        for l in list_of_lists[i]:
-            try:
-                # attempt to look up letter
-                idx = alphabet.index(l)
-                # fetches morse code for letter
-                words.append(morse_alphabet[idx])
-            except:
-            
-                continue
-        translate.append(' '.join(words))
-    return ' / '.join(translate)
-    
-    
-def morseDecode(morse_string):
-    """
-    Assumes file contains a single string of the form
-    '.-' '-...' / 
-    where whitespace is a letter seperator and /
-    is a word seperator
-    
-    should not be called directly
-    """
-    
-    morse_alphabet = ['.-', '-...', '-.-.', '-..', '.', '..-.', '--.', '....', '..', '.---', '-.-', '.-..', '--', '-.', '---', '.--.', '--.-', '.-.', '...', '-', '..-', '...-', '.--', '-..-', '-.--', '--..']
-
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    
-    morse_words = morse_string.split(' / ')
-    morse_letters = [w.split(' ') for w in morse_words]
-    
-    translate = []
-    for i in range(len(morse_letters)):
-        words = []
-        for ml in morse_letters[i]:
-            try:
-                idx = morse_alphabet.index(ml)
-                words.append(alphabet[idx])
-            except:
-                continue
-        translate.append(''.join(words))
-    return ' '.join(translate)
-
-#=============================================
-
-
-    
-     
-if __name__ == '__main__': 
-    welcome()
 
   
